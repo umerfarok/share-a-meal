@@ -5,31 +5,37 @@ const AuthContext = createContext();
 
 function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [token, setToken] = useState(null); 
 
   const getCurrentUser = async () => {
+    debugger
     try {
-      const user = await auth.getCurrentUser();
-      console.log("current user", user);
+      const { session: user, token } = await auth.getSession();
+      console.log("current user", user, "token", token);
       setUser(user);
+      setToken(token); 
       return user;
     } catch (err) {
       // not logged in
       console.log(err);
       setUser(null);
+      setToken(null);
       return []
     }
   };
 
   useEffect(() => {
-    getCurrentUser()
-      .then(() => setIsLoading(false))
-      .catch(() => setIsLoading(false));
+    async function fetchData() {
+      await getCurrentUser();
+      setIsLoading(false);
+    }
+    fetchData();
   }, []);
 
   const signIn = async (username, password) => {
     await auth.signIn(username, password);
-    await auth.fetchUser();
+    // await auth.fetchUser();
   };
   const signOut = async () => {
     await auth.signOut();
@@ -38,6 +44,7 @@ function AuthProvider({ children }) {
 
   const authValue = {
     user,
+    token,
     isLoading,
     signIn,
     signOut,
@@ -50,10 +57,4 @@ function AuthProvider({ children }) {
 
 export { AuthProvider, AuthContext };
 
-export const getIdToken = async () => {
-  const user = await auth.getCurrentUser();
-  return user?.token?.jwtToken || null;
-}
-export const useAuthContext = () => {
-  return useContext(AuthContext);
-};
+

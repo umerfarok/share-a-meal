@@ -140,7 +140,6 @@ import {
       });
     });
   }
-  
   export function getSession() {
     const cognitoUser = userPool.getCurrentUser();
     return new Promise((resolve, reject) => {
@@ -153,7 +152,8 @@ import {
           reject(err);
           return;
         }
-        resolve(session);
+        const token = session.getIdToken().getJwtToken();
+        resolve({ session, token });
       });
     });
   }

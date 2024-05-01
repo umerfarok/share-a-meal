@@ -10,8 +10,23 @@ import Profile from "./Auth/UserProfile";
 import ForgotPassword from "./Auth/ForgotPassword";
 import ResetPassword from "./Auth/ResetPassword";
 import RouteGuard from "./protectRoute";
+import AdminDashboard from "./components/AdminDashboard";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retries: (failureCount, error) => {
+        // Only retry if the error was a network error
+        if (error.message === 'Network Error') {
+          // Retry up to 3 times, with a delay of 1 second between retries
+          return failureCount <= 1 ? 1000 : false;
+        }
+        // Do not retry for other types of errors
+        return false;
+      },
+    },
+  },
+});
 
 function App() {
   return (
@@ -35,6 +50,7 @@ function App() {
               <li>
                 <Link to="/profile">Profile</Link>
               </li>
+              <li><Link to="/admin">AdminDashboard</Link></li>
             </ul>
           </nav>
 
@@ -48,6 +64,7 @@ function App() {
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/confirm-sign-up" element={<ConfirmSignUp />} />
+              <Route path="/admin" element={<AdminDashboard />} />
 
               <Route
                 path="/profile"

@@ -27,6 +27,7 @@ const verifyToken = async (token) => {
       isTokenValid = true;
       return decoded;
     } catch (err) {
+      console.log(err);
       // Token verification failed, try the next key
     }
   }

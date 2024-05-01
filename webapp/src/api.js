@@ -1,16 +1,23 @@
-
+// useApi.js
+import { useContext } from 'react';
+import { useQuery } from 'react-query';
 import axios from 'axios';
-import { getIdToken } from './Auth/AuthContext'; 
-import process from 'process'; 
+import { AuthContext } from './Auth/AuthContext';
+export function useApi(endpoint, queryKey) {
+  const { token } = useContext(AuthContext);
+  
+  const fetchData = async () => {
+    const config = {
+      method: 'get',
+      url: `${import.meta.env.VITE_APP_API_BASE_URL}${endpoint}`,
+      headers: {
+        Authorization: token ? `Bearer ${token}` : '',
+      },
+    };
 
-const api = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL || 'http://localhost:3000',
-});
+    const response = await axios(config);
+    return response.data;
+  };
 
-api.interceptors.request.use(async (config) => {
-  const token = await getIdToken();
-  config.headers.Authorization = token ? `Bearer ${token}` : '';
-  return config;
-});
-
-export default api;
+  return useQuery(queryKey, fetchData, { enabled: !!token, retry: 3 });
+}

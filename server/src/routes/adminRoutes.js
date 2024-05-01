@@ -11,9 +11,9 @@ router.use(async (req, res, next) => {
     try {
       const decoded = await authController.verifyToken(token);
       req.user = decoded;
-
+      console.log(decoded)
       // Check if the user has the admin role
-      if (decoded['cognito:roles'].includes('admin')) {
+      if (decoded['cognito:groups'].includes('SuperAdmin')) {
         next();
       } else {
         res.status(403).json({ error: 'Forbidden: Unauthorized access' });
