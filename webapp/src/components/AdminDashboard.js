@@ -1,31 +1,18 @@
-import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import api from '../../../shared/utils/api';
+import { useCustomQuery } from '../useCustomQuery';
 
 const AdminDashboard = () => {
-  const [users, setUsers] = useState([]);
-  const [listings, setListings] = useState([]);
-  const [reports, setReports] = useState([]);
+  const { data: users, error: usersError, isLoading: usersLoading } = useCustomQuery('/admin/users', 'users');
+  const { data: listings, error: listingsError, isLoading: listingsLoading } = useCustomQuery('/admin/listings', 'listings');
+  const { data: reports, error: reportsError, isLoading: reportsLoading } = useCustomQuery('/admin/reports', 'reports');
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const usersResponse = await api.get('/admin/users');
-        setUsers(usersResponse.data);
+  if (usersLoading || listingsLoading || reportsLoading) {
+    return 'Loading...';
+  }
 
-        const listingsResponse = await api.get('/admin/listings');
-        setListings(listingsResponse.data);
-
-        const reportsResponse = await api.get('/admin/reports');
-        setReports(reportsResponse.data);
-      } catch (error) {
-        console.error('Error fetching admin data:', error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
+  if (usersError || listingsError || reportsError) {
+    return 'An error occurred.';
+  }
   return (
     <div>
       <h2>Admin Dashboard</h2>

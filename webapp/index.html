@@ -9,5 +9,10 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      /* https://ui.docs.amplify.aws/vue/getting-started/troubleshooting */
+      window.global = window;
+      var exports = {};
+    </script>
   </body>
 </html>
