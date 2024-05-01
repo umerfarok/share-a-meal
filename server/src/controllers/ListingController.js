@@ -32,8 +32,7 @@ exports.getAllListings = async (req, res) => {
 exports.claimListing = async (req, res) => {
   try {
     const { listingId } = req.params;
-    const userId = req.user.sub; // Assuming req.user.sub contains the user ID from the JWT
-
+    const userId = req.user.sub; 
     const listing = await Listing.findById(listingId);
     if (!listing) {
       return res.status(404).json({ error: 'Listing not found' });

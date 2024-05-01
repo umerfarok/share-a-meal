@@ -3,8 +3,7 @@ const Rating = require('../models/Rating');
 exports.createRating = async (req, res) => {
   try {
     const { restaurantId, mealId, rating, comment } = req.body;
-    const userId = req.user.sub; // Assuming req.user.sub contains the user ID from the JWT
-
+    const userId = req.user.sub; 
     const newRating = new Rating({
       restaurant: restaurantId,
       meal: mealId,

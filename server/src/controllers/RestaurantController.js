@@ -18,7 +18,7 @@ exports.getRestaurantProfile = async (req, res) => {
 
 exports.updateRestaurantProfile = async (req, res) => {
   try {
-    const userId = req.user.sub; // Assuming req.user.sub contains the user ID from the JWT
+    const userId = req.user.sub; 
     const { name, location, contactInfo, operatingHours } = req.body;
 
     const user = await User.findByIdAndUpdate(

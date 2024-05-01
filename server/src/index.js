@@ -6,7 +6,7 @@ const authRoutes = require('./routes/authRoutes');
 const listingRoutes = require('./routes/listingRoutes');
 const restaurantRoutes = require('./routes/restaurantRoutes');
 const adminRoutes = require('./routes/adminRoutes');
-const ratingRoutes = require('./routes/ratingRoutes'); // Import ratingRoutes
+const ratingRoutes = require('./routes/ratingRoutes');
 
 // MongoDB connection
 mongoose.connect('mongodb://maxstore:maxstore-password@localhost:27017', {
