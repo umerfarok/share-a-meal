@@ -29,7 +29,7 @@ function AuthProvider({ children }) {
 
   const signIn = async (username, password) => {
     await auth.signIn(username, password);
-    // await auth.fetchUser();
+    await auth.fetchUser();
   };
   const signOut = async () => {
     await auth.signOut();

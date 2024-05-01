@@ -10,9 +10,7 @@ import Profile from "./Auth/UserProfile";
 import ForgotPassword from "./Auth/ForgotPassword";
 import ResetPassword from "./Auth/ResetPassword";
 import RouteGuard from "./protectRoute";
-// At the top of your index.js or main.js file
-window.global = window;
-// Create a client
+
 const queryClient = new QueryClient();
 
 function App() {
