@@ -9,6 +9,26 @@ import {
     UserPoolId: cognitoConfig.UserPoolId,
     ClientId: cognitoConfig.ClientId,
   });
+
+  
+export function resendCode(username) {
+  return new Promise((resolve, reject) => {
+    const userData = {
+      Username: username,
+      Pool: userPool,
+    };
+
+    const cognitoUser = new CognitoUser(userData);
+
+    cognitoUser.resendConfirmationCode((err, result) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(result);
+    });
+  });
+}
   
   export function signUp(username, email, password) {
     return new Promise((resolve, reject) => {
