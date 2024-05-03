@@ -3,6 +3,7 @@
     "aws-sdk": "^2.1608.0",
     "cors": "^2.8.5",
     "express": "^4.19.2",
+    "geolib": "^3.3.4",
     "jsonwebtoken": "^9.0.2",
     "jwk-to-pem": "^2.0.5",
     "mongoose": "^8.3.2",

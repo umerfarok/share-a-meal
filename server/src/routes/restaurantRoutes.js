@@ -22,5 +22,7 @@ router.use(async (req, res, next) => {
 
 router.get('/profile', restaurantController.getRestaurantProfile);
 router.put('/profile', restaurantController.updateRestaurantProfile);
+router.get('/nearby', restaurantController.getNearbyRestaurants);
+
 
 module.exports = router;
