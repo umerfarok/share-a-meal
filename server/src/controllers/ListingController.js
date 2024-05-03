@@ -3,7 +3,7 @@ const Listing = require('../models/Listing');
 exports.createListing = async (req, res) => {
   try {
     const { foodType, quantity, expirationDate, dietaryInfo } = req.body;
-    const restaurant = req.user.sub; // Assuming req.user.sub contains the user ID from the JWT
+    const restaurant = req.user.sub; 
 
     const newListing = new Listing({
       restaurant,

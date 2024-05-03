@@ -1,5 +1,6 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
+
+import PropTypes from 'prop-types';
 
 const ListingCard = ({ listing }) => {
   const { restaurant, foodType, quantity, expirationDate, dietaryInfo } = listing;
@@ -15,5 +16,21 @@ const ListingCard = ({ listing }) => {
     </div>
   );
 };
+
+ListingCard.propTypes = {
+  listing: PropTypes.shape({
+    restaurant: PropTypes.shape({
+      name: PropTypes.string.isRequired
+    }).isRequired,
+    foodType: PropTypes.string.isRequired,
+    quantity: PropTypes.number.isRequired,
+    expirationDate: PropTypes.string,
+    dietaryInfo: PropTypes.string,
+    _id: PropTypes.string.isRequired 
+  }).isRequired
+};
+
+
+
 
 export default ListingCard;

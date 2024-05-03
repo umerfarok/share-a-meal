@@ -1,23 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { useApi } from '../api';
 
 const ListingList = () => {
+  const { data: listingsdata, error, isLoading } = useApi('/api/listings/all', 'listings');
   const [listings, setListings] = useState([]);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchListings = async () => {
-      try {
-        const response = await axios.get('/api/listings/all');
-        setListings(response.data);
-      } catch (error) {
-        setError(error.response.data.error);
-      }
-    };
-
-    fetchListings();
-  }, []);
 
   const handleClaimListing = async (listingId) => {
     try {
@@ -40,19 +28,21 @@ const ListingList = () => {
         );
       }
     } catch (error) {
-      setError(error.response.data.error);
+      console.error(error);
     }
   };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
 
   return (
     <div>
       <h2>Available Listings</h2>
-      {error && <p>{error}</p>}
-      {listings.length === 0 ? (
+      {listingsdata.length === 0 ? (
         <p>No listings available.</p>
       ) : (
         <ul>
-          {listings.map((listing) => (
+          {listingsdata.map((listing) => (
             <li key={listing._id}>
               <h3>{listing.foodType}</h3>
               <p>Quantity: {listing.quantity}</p>
