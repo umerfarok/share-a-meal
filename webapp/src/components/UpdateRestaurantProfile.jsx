@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { usePostApi, useGetApi } from '../api';
 
 const UpdateRestaurantProfile = () => {
   const [name, setName] = useState('');
@@ -8,41 +8,15 @@ const UpdateRestaurantProfile = () => {
   const [operatingHours, setOperatingHours] = useState('');
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get('/api/restaurants/profile', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setName(response.data.name);
-        setLocation(response.data.location);
-        setContactInfo(response.data.contactInfo);
-        setOperatingHours(response.data.operatingHours);
-      } catch (error) {
-        setError(error.response.data.error);
-      }
-    };
-
-    fetchProfile();
-  }, []);
+  const { data: profile, error: profileError, isLoading: profileLoading } = useGetApi('/restaurants/profile', 'profile');
+  const { mutate: createProfile } = usePostApi('/restaurants/profile');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.put(
-        '/api/restaurants/profile',
+      const response = await createProfile(
         { name, location, contactInfo, operatingHours },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
       );
 
       if (response.status === 200) {
@@ -99,7 +73,7 @@ const UpdateRestaurantProfile = () => {
             required
           />
         </div>
-        <button type="submit">Update Profile</button>
+        <button type="submit">Create Profile</button>
       </form>
     </div>
   );

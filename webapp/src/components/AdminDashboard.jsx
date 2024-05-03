@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
-import { useApi } from '../api';
+import { useGetApi } from '../api';
 
 const AdminDashboard = () => {
-  const { data: users, error: usersError, isLoading: usersLoading } = useApi('/admin/users', 'users');
-  const { data: listings, error: listingsError, isLoading: listingsLoading } = useApi('/admin/listings', 'listings');
-  const { data: reports, error: reportsError, isLoading: reportsLoading } = useApi('/admin/reports', 'reports');
+  const { data: users, error: usersError, isLoading: usersLoading } = useGetApi('/admin/users', 'users');
+  const { data: listings, error: listingsError, isLoading: listingsLoading } = useGetApi('/admin/listings', 'listings');
+  const { data: reports, error: reportsError, isLoading: reportsLoading } = useGetApi('/admin/reports', 'reports');
 
   if (usersLoading || listingsLoading || reportsLoading) {
     return 'Loading...';

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { useApi } from '../api';
+import { useGetApi } from '../api';
 
 const ListingList = () => {
-  const { data: listingsdata, error, isLoading } = useApi('/api/listings/all', 'listings');
+  const { data: listingsdata, error, isLoading } = useGetApi('/api/listings/all', 'listings');
   const [listings, setListings] = useState([]);
 
   const handleClaimListing = async (listingId) => {

@@ -2,7 +2,7 @@ const User = require('../models/User');
 const geolib = require('geolib'); 
 exports.getRestaurantProfile = async (req, res) => {
   try {
-    const userId = req.user.sub; // Assuming req.user.sub contains the user ID from the JWT
+    const userId = req.user.sub; 
     const user = await User.findById(userId);
 
     if (!user || !user.isRestaurant) {
@@ -15,6 +15,28 @@ exports.getRestaurantProfile = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+exports.createRestaurantProfile = async (req, res) => {
+  try {
+    const userId = req.user.sub; 
+    const { name, location, contactInfo, operatingHours, isRestaurant } = req.body;
+
+    const user = await User.create({
+      userId,
+      isRestaurant,
+      restaurantInfo: {
+        name,
+        location,
+        contactInfo,
+        operatingHours,
+      },
+    });
+    console.log(user)
+    res.status(201).json({ message: 'Restaurant profile created successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
 
 exports.updateRestaurantProfile = async (req, res) => {
   try {

@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import { useApi } from '../api';
+import { useGetApi } from '../api';
 
 const ListingDetails = () => {
   const { listingId } = useParams();
-  const { data: listingdata, error, isLoading } = useApi(`/api/listings/${listingId}`, 'listing');
+  const { data: listingdata, error, isLoading } = useGetApi(`/api/listings/${listingId}`, 'listing');
   const [listing, setListing] = useState(null);
 
 

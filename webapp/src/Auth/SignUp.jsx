@@ -4,16 +4,19 @@ import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import { signUp, confirmSignUp, resendCode } from "./auth";
+import RestaurantProfileForm from "./RestaurantProfileForm";
+import { useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    textAlign: "center",
-    marginTop: theme.spacing(4),
-  },
-  form: {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
+    padding: theme.spacing(2),
+  },
+  form: {
+    width: "100%",
+    maxWidth: 400,
     marginTop: theme.spacing(2),
   },
   input: {
@@ -21,6 +24,11 @@ const useStyles = makeStyles((theme) => ({
   },
   error: {
     color: "red",
+    marginTop: theme.spacing(2),
+  },
+  buttonGroup: {
+    display: "flex",
+    justifyContent: "space-between",
     marginTop: theme.spacing(2),
   },
   countdown: {
@@ -31,14 +39,16 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Signup() {
   const classes = useStyles();
+  const navigate = useNavigate();
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
-  const [isConfirmed, setIsConfirmed] = useState(false);
+  const [isRestaurant, setIsRestaurant] = useState(false);
   const [isSignedUp, setIsSignedUp] = useState(false);
+  const [isConfirmed, setIsConfirmed] = useState(false);
   const [canResend, setCanResend] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(60);
 
@@ -59,7 +69,7 @@ export default function Signup() {
     setError("");
 
     try {
-      await signUp(username, email, password);
+      await signUp(username, email, password, isRestaurant);
       setIsSignedUp(true);
     } catch (err) {
       setError(err.message);
@@ -89,13 +99,31 @@ export default function Signup() {
     }
   };
 
-  if (isConfirmed) {
+  const createUserProfile = (username, email) => {
+    // Create basic user profile in the database
+    console.log(`Creating basic user profile for ${username} with email ${email}`);
+  };
+
+  if (isConfirmed && isRestaurant) {
+    return <RestaurantProfileForm />;
+  }
+
+  if (isConfirmed && !isRestaurant) {
+    createUserProfile(username, email);
     return (
       <div className={classes.root}>
-        <Typography variant="h2">Confirmation successful!</Typography>
+        <Typography variant="h2">User Profile Created</Typography>
         <Typography variant="body1">
-          You can now log in with your credentials. Go rock that app!
+          Your user profile has been created successfully. You can now log in and browse for available meals.
         </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => navigate("/login")}
+          className={classes.input}
+        >
+          Go to Login
+        </Button>
       </div>
     );
   }
@@ -111,8 +139,9 @@ export default function Signup() {
             label="Confirmation code"
             value={code}
             onChange={(e) => setCode(e.target.value)}
+            fullWidth
           />
-          <Button type="submit" variant="contained" color="primary">
+          <Button type="submit" variant="contained" color="primary" fullWidth>
             Confirm
           </Button>
           <Button
@@ -120,11 +149,14 @@ export default function Signup() {
             disabled={!canResend}
             variant="contained"
             color="secondary"
+            fullWidth
           >
             Resend Code
           </Button>
           <Typography className={classes.countdown}>
-            {canResend ? "Code expired, you can resend" : `Resend in ${secondsLeft} seconds`}
+            {canResend
+              ? "Code expired, you can resend"
+              : `Resend in ${secondsLeft} seconds`}
           </Typography>
           <Typography variant="body2" color="textSecondary">
             If you don't receive the code, please check your spam folder.
@@ -134,9 +166,10 @@ export default function Signup() {
       </div>
     );
   }
+
   return (
     <div className={classes.root}>
-      <Typography variant="h2">Signup</Typography>
+      <Typography variant="h2">Sign up</Typography>
       <form className={classes.form} onSubmit={handleSignUp}>
         <TextField
           className={classes.input}
@@ -144,6 +177,7 @@ export default function Signup() {
           label="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+          fullWidth
         />
         <TextField
           className={classes.input}
@@ -151,6 +185,7 @@ export default function Signup() {
           label="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          fullWidth
         />
         <TextField
           className={classes.input}
@@ -158,9 +193,26 @@ export default function Signup() {
           label="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          fullWidth
         />
-        <Button type="submit" variant="contained" color="primary">
-          Signup
+        <div className={classes.buttonGroup}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setIsRestaurant(true)}
+          >
+            Sign up as Restaurant
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => setIsRestaurant(false)}
+          >
+            Sign up as User
+          </Button>
+        </div>
+        <Button type="submit" variant="contained" color="primary" fullWidth>
+          Sign up
         </Button>
       </form>
       {error && <Typography className={classes.error}>{error}</Typography>}

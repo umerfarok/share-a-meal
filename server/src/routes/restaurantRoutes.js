@@ -21,6 +21,7 @@ router.use(async (req, res, next) => {
 });
 
 router.get('/profile', restaurantController.getRestaurantProfile);
+router.post('/profile', restaurantController.createRestaurantProfile);
 router.put('/profile', restaurantController.updateRestaurantProfile);
 router.get('/nearby', restaurantController.getNearbyRestaurants);
 
