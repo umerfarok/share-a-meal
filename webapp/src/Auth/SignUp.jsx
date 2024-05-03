@@ -1,7 +1,37 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { makeStyles } from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
+import Button from "@material-ui/core/Button";
+import Typography from "@material-ui/core/Typography";
 import { signUp, confirmSignUp, resendCode } from "./auth";
 
+const useStyles = makeStyles((theme) => ({
+  root: {
+    textAlign: "center",
+    marginTop: theme.spacing(4),
+  },
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    marginTop: theme.spacing(2),
+  },
+  input: {
+    marginBottom: theme.spacing(2),
+  },
+  error: {
+    color: "red",
+    marginTop: theme.spacing(2),
+  },
+  countdown: {
+    fontSize: "0.8rem",
+    marginTop: theme.spacing(1),
+  },
+}));
+
 export default function Signup() {
+  const classes = useStyles();
+
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -10,6 +40,19 @@ export default function Signup() {
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [isSignedUp, setIsSignedUp] = useState(false);
   const [canResend, setCanResend] = useState(false);
+  const [secondsLeft, setSecondsLeft] = useState(60);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (secondsLeft > 0) {
+        setSecondsLeft(secondsLeft - 1);
+      } else {
+        setCanResend(true);
+      }
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [secondsLeft, canResend]);
 
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -18,7 +61,6 @@ export default function Signup() {
     try {
       await signUp(username, email, password);
       setIsSignedUp(true);
-      setTimeout(() => setCanResend(true), 60000); 
     } catch (err) {
       setError(err.message);
     }
@@ -41,7 +83,7 @@ export default function Signup() {
     try {
       await resendCode(username);
       setCanResend(false);
-      setTimeout(() => setCanResend(true), 60000); 
+      setSecondsLeft(60);
     } catch (err) {
       setError(err.message);
     }
@@ -49,58 +91,79 @@ export default function Signup() {
 
   if (isConfirmed) {
     return (
-      <div>
-        <h2>Confirmation successful!</h2>
-        <p>You can now log in with your credentials. Go rock that app!</p>
+      <div className={classes.root}>
+        <Typography variant="h2">Confirmation successful!</Typography>
+        <Typography variant="body1">
+          You can now log in with your credentials. Go rock that app!
+        </Typography>
       </div>
     );
   }
 
   if (isSignedUp) {
     return (
-      <div>
-        <h2>Confirm Sign Up</h2>
-        <form onSubmit={handleConfirm}>
-          <input
+      <div className={classes.root}>
+        <Typography variant="h2">Confirm Sign Up</Typography>
+        <form className={classes.form} onSubmit={handleConfirm}>
+          <TextField
+            className={classes.input}
             type="text"
-            placeholder="Confirmation code"
+            label="Confirmation code"
             value={code}
             onChange={(e) => setCode(e.target.value)}
           />
-          <button type="submit">Confirm</button>
-          <button onClick={handleResendCode} disabled={!canResend}>
+          <Button type="submit" variant="contained" color="primary">
+            Confirm
+          </Button>
+          <Button
+            onClick={handleResendCode}
+            disabled={!canResend}
+            variant="contained"
+            color="secondary"
+          >
             Resend Code
-          </button>
+          </Button>
+          <Typography className={classes.countdown}>
+            {canResend ? "Code expired, you can resend" : `Resend in ${secondsLeft} seconds`}
+          </Typography>
+          <Typography variant="body2" color="textSecondary">
+            If you don't receive the code, please check your spam folder.
+          </Typography>
         </form>
-        {error && <p>{error}</p>}
+        {error && <Typography className={classes.error}>{error}</Typography>}
       </div>
     );
   }
   return (
-    <div>
-      <h2>Signup</h2>
-      <form onSubmit={handleSignUp}>
-        <input
+    <div className={classes.root}>
+      <Typography variant="h2">Signup</Typography>
+      <form className={classes.form} onSubmit={handleSignUp}>
+        <TextField
+          className={classes.input}
           type="text"
-          placeholder="Username"
+          label="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
-        <input
+        <TextField
+          className={classes.input}
           type="email"
-          placeholder="Email"
+          label="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        <input
+        <TextField
+          className={classes.input}
           type="password"
-          placeholder="Password"
+          label="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button type="submit">Signup</button>
+        <Button type="submit" variant="contained" color="primary">
+          Signup
+        </Button>
       </form>
-      {error && <p>{error}</p>}
+      {error && <Typography className={classes.error}>{error}</Typography>}
     </div>
   );
 }

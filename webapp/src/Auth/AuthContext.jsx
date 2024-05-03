@@ -9,7 +9,6 @@ function AuthProvider({ children }) {
   const [token, setToken] = useState(null); 
 
   const getCurrentUser = async () => {
-    debugger
     try {
       const { session: user, token } = await auth.getSession();
       console.log("current user", user, "token", token);
