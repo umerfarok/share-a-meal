@@ -1,46 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import TextField from "@material-ui/core/TextField";
-import Button from "@material-ui/core/Button";
-import Typography from "@material-ui/core/Typography";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
 import { signUp, confirmSignUp, resendCode } from "./auth";
-import RestaurantProfileForm from "./RestaurantProfileForm";
-import { useNavigate } from "react-router-dom";
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    padding: theme.spacing(2),
-  },
-  form: {
-    width: "100%",
-    maxWidth: 400,
-    marginTop: theme.spacing(2),
-  },
-  input: {
-    marginBottom: theme.spacing(2),
-  },
-  error: {
-    color: "red",
-    marginTop: theme.spacing(2),
-  },
-  buttonGroup: {
-    display: "flex",
-    justifyContent: "space-between",
-    marginTop: theme.spacing(2),
-  },
-  countdown: {
-    fontSize: "0.8rem",
-    marginTop: theme.spacing(1),
-  },
-}));
+import { Link } from "react-router-dom";
 
 export default function Signup() {
-  const classes = useStyles();
-  const navigate = useNavigate();
-
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -60,14 +25,13 @@ export default function Signup() {
         setCanResend(true);
       }
     }, 1000);
-
     return () => clearTimeout(timer);
   }, [secondsLeft, canResend]);
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-    setError("");
-
+    setError(""); 
+    setSecondsLeft(60);
     try {
       await signUp(username, email, password, isRestaurant);
       setIsSignedUp(true);
@@ -79,7 +43,6 @@ export default function Signup() {
   const handleConfirm = async (e) => {
     e.preventDefault();
     setError("");
-
     try {
       await confirmSignUp(username, code);
       setIsConfirmed(true);
@@ -111,111 +74,121 @@ export default function Signup() {
   if (isConfirmed && !isRestaurant) {
     createUserProfile(username, email);
     return (
-      <div className={classes.root}>
-        <Typography variant="h2">User Profile Created</Typography>
-        <Typography variant="body1">
-          Your user profile has been created successfully. You can now log in and browse for available meals.
-        </Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => navigate("/login")}
-          className={classes.input}
-        >
-          Go to Login
-        </Button>
+      <div className="flex h-screen w-full items-center justify-center px-4">
+        <div className="w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-md ">
+          <div className="space-y-4 text-center">
+            <h2 className="text-3xl font-semibold mb-5 text-purple-700">Confirmation successful!</h2>
+            <Typography variant="body1">
+              You can now log in with your credentials. Go rock that app!
+            </Typography>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (isSignedUp) {
     return (
-      <div className={classes.root}>
-        <Typography variant="h2">Confirm Sign Up</Typography>
-        <form className={classes.form} onSubmit={handleConfirm}>
-          <TextField
-            className={classes.input}
-            type="text"
-            label="Confirmation code"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            fullWidth
-          />
-          <Button type="submit" variant="contained" color="primary" fullWidth>
-            Confirm
-          </Button>
-          <Button
-            onClick={handleResendCode}
-            disabled={!canResend}
-            variant="contained"
-            color="secondary"
-            fullWidth
-          >
-            Resend Code
-          </Button>
-          <Typography className={classes.countdown}>
-            {canResend
-              ? "Code expired, you can resend"
-              : `Resend in ${secondsLeft} seconds`}
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
-            If you don't receive the code, please check your spam folder.
-          </Typography>
-        </form>
-        {error && <Typography className={classes.error}>{error}</Typography>}
+      <div className="flex h-[600px] w-full items-center justify-center px-4">
+        <div className="w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-md ">
+          <div className="space-y-4 text-center">
+            <h2 className="text-3xl font-semibold mb-5 text-purple-700">Confirm sign Up</h2>
+          </div>
+          <form onSubmit={handleConfirm} className="space-y-4">
+            <TextField
+              className="w-full rounded-md"
+              id="outlined-basic"
+              label="Confirmation code"
+              variant="outlined"
+              color="secondary"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+            />
+            <div className="flex flex-row gap-4 items-center justify-center">
+            <Button
+              type="submit"
+              variant="outlined"
+              color="success"
+              className="w-48 rounded-md mr-3"
+            >
+              Confirm
+            </Button>
+            <Button 
+              onClick={handleResendCode}
+              disabled={!canResend}
+              variant="outlined"
+              color="secondary"
+              className="w-48 rounded-md "
+            >
+              Resend Code
+            </Button>
+            </div>
+            <Typography className="text-center text-sm text-gray-500">
+              {canResend
+                ? "Code expired, you can resend"
+                : `Resend in ${secondsLeft} seconds`}
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              If you don't receive the code, please check your spam folder.
+            </Typography>
+          </form>
+          {error && <Typography color="error">{error}</Typography>}
+        </div>
       </div>
     );
   }
 
+
   return (
-    <div className={classes.root}>
-      <Typography variant="h2">Sign up</Typography>
-      <form className={classes.form} onSubmit={handleSignUp}>
-        <TextField
-          className={classes.input}
-          type="text"
-          label="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          fullWidth
-        />
-        <TextField
-          className={classes.input}
-          type="email"
-          label="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          fullWidth
-        />
-        <TextField
-          className={classes.input}
-          type="password"
-          label="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          fullWidth
-        />
-        <div className={classes.buttonGroup}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => setIsRestaurant(true)}
-          >
-            Sign up as Restaurant
-          </Button>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => setIsRestaurant(false)}
-          >
-            Sign up as User
-          </Button>
+    <div className="flex h-[600px] w-full items-center justify-center px-4">
+      <div className="w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-md ">
+        <div className="space-y-4 text-center">
+        <h2 className="text-3xl font-bold mb-5 text-purple-700">Sign up</h2>
         </div>
-        <Button type="submit" variant="contained" color="primary" fullWidth>
-          Sign up
-        </Button>
-      </form>
-      {error && <Typography className={classes.error}>{error}</Typography>}
+        <form onSubmit={handleSignUp} className="space-y-4">
+          <TextField
+            className="w-full rounded-md"
+            id="outlined-basic"
+            label="Username"
+            variant="outlined"
+            color="secondary"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+          <TextField
+            className="w-full rounded-md"
+            id="outlined-basic"
+            label="Email"
+            variant="outlined"
+            color="secondary"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <TextField
+            className="w-full rounded-md"
+            id="outlined-basic"
+            label="Password"
+            type="password"
+            variant="outlined"
+            color="secondary"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button
+          className="w-full rounded-md bg-purple-800 py-2 font-medium text-white transition-colors hover:bg-purple-700/80 focus:outline-none focus:ring-2 focus:ring-purple-700 focus:ring-offset-2 "
+          type="submit"
+        >
+        Sign up
+        </button>
+          <div className="text-center text-sm text-gray-500">
+            Already have an account?{" "}
+            <Link to="/login" className="underline hover:text-gray-900">
+              Login
+            </Link>
+          </div>
+        </form>
+        {error && <Typography color="error">{error}</Typography>}
+      </div>
     </div>
   );
 }

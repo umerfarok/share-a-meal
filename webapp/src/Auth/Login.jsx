@@ -2,6 +2,7 @@ import { useState, useContext } from "react"
 import { AuthContext } from "./AuthContext"
 import { Navigate } from "react-router-dom";
 import { Link } from "react-router-dom"
+import TextField from '@mui/material/TextField';
 
 export default function Login() {
   const [username, setUsername] = useState("")
@@ -23,32 +24,37 @@ export default function Login() {
   }
 
   console.log({user})
-  // If the user is logged in, don't show the login form
   if (user) {
-    // Redirect to the profile page
     return <Navigate to="/profile" />
   }
 
   return (
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button type="submit">Login</button>
+    <div className="flex  h-[600px] w-full items-center justify-center px-4">
+    <div className="w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-md ">
+      <div className="space-y-4 text-center">
+        <h2 className="text-3xl font-bold mb-5 text-purple-700">Login</h2>
+      </div>
+      <form className="space-y-4" onSubmit={handleSubmit}>
+        <div className="space-y-2">
+
+        </div>
+        <TextField    className="w-full rounded-md " id="outlined-basic" label="Username" variant="outlined" color="secondary"   onChange={(e) => setUsername(e.target.value)}  value={username}/>
+        <div className="space-y-2">
+        <TextField    className="w-full rounded-md " id="outlined-basic" label="Password" variant="outlined" color="secondary"     value={password}
+            onChange={(e) => setPassword(e.target.value)}/>
+    
+        </div>
+        <button
+          className="w-full rounded-md bg-purple-800 py-2 font-medium text-white transition-colors hover:bg-purple-700/80 focus:outline-none focus:ring-2 focus:ring-purple-800 focus:ring-offset-2 "
+          type="submit"
+        >
+          Login
+        </button>
+        <div className="text-center text-sm text-gray-500 underline hover:text-gray-900 ">
+        <Link to="/forgot-password">Forgot Password</Link>
+        </div>
       </form>
-      {error && <p>{error}</p>}
-      <Link to="/forgot-password">Forgot Password</Link>
     </div>
+  </div>
   )
 }

@@ -15,6 +15,7 @@ import ListingDetails from './components/ListingDetails';
 import RestaurantRatings from './components/RestaurantRatings';
 import RestaurantProfile from './components/RestaurantProfile';
 import UpdateRestaurantProfile from './components/UpdateRestaurantProfile';
+import Navbar from './components/Navbar/Navbar';
 import './styles.css';
 
 const queryClient = new QueryClient({
@@ -35,39 +36,7 @@ function App() {
     <AuthProvider>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
-          <nav>
-            <div className="nav-container">
-              <div className="nav-logo">
-                <Link to="/">ShareAMeal</Link>
-              </div>
-              <ul className="nav-links">
-                <li>
-                  <Link to="/about">About</Link>
-                </li>
-                <li>
-                  <Link to="/login">Login</Link>
-                </li>
-                <li>
-                  <Link to="/signup">Sign Up</Link>
-                </li>
-                <li>
-                  <Link to="/profile">Profile</Link>
-                </li>
-                <li>
-                  <Link to="/admin">Admin</Link>
-                </li>
-                <li>
-                  <Link to="/listings">Listings</Link>
-                </li>
-                <li>
-                  <Link to="/restaurant-profile">Restaurant Profile</Link>
-                </li>
-                <li>
-                  <Link to="/update-restaurant-profile">Update Restaurant Profile</Link>
-                </li>
-              </ul>
-            </div>
-          </nav>
+          <Navbar />
           <main>
             <Routes>
               <Route path="/about" element={<Profile />} />
