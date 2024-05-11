@@ -1,55 +1,81 @@
 import { Link } from 'react-router-dom';
 import { useGetApi } from '../api';
+import {
+  Box,
+  Container,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
+
+const StyledContainer = styled(Container)({
+  backgroundColor: '#f5f5f5',
+  padding: '20px',
+  borderRadius: '10px',
+});
 
 const AdminDashboard = () => {
   const { data: users, error: usersError, isLoading: usersLoading } = useGetApi('/admin/users', 'users');
-  const { data: listings, error: listingsError, isLoading: listingsLoading } = useGetApi('/admin/listings', 'listings');
-  const { data: reports, error: reportsError, isLoading: reportsLoading } = useGetApi('/admin/reports', 'reports');
 
-  if (usersLoading || listingsLoading || reportsLoading) {
-    return 'Loading...';
+  if (usersLoading) {
+    return <Typography variant="h4">Loading...</Typography>;
   }
 
-  if (usersError || listingsError || reportsError) {
-    return 'An error occurred.';
+  if (usersError) {
+    return <Typography variant="h4">An error occurred.</Typography>;
   }
+
   return (
-    <div>
-      <h2>Admin Dashboard</h2>
-
-      <div>
-        <h3>Users</h3>
-        <ul>
-          {users.map((user) => (
-            <li key={user._id}>
-              <Link to={`/admin/users/${user._id}`}>{user.email}</Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div>
-        <h3>Listings</h3>
-        <ul>
-          {listings.map((listing) => (
-            <li key={listing._id}>
-              <Link to={`/admin/listings/${listing._id}`}>{listing.foodType}</Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div>
-        <h3>Reported Issues</h3>
-        <ul>
-          {reports.map((report) => (
-            <li key={report._id}>
-              <Link to={`/admin/reports/${report._id}`}>{report.title}</Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
+    <StyledContainer>
+      <Typography variant="h2">Admin Dashboard</Typography>
+      <Box sx={{ my: 4 }}>
+        <Typography variant="h3">Users</Typography>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Email</TableCell>
+                <TableCell>Name</TableCell>
+                <TableCell>Is Restaurant</TableCell>
+                <TableCell>Restaurant Info</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow key={user._id}>
+                  <TableCell>
+                    <Link to={`/admin/users/${user._id}`}>{user.email}</Link>
+                  </TableCell>
+                  <TableCell>{user.name}</TableCell>
+                  <TableCell>{user.isRestaurant ? 'Yes' : 'No'}</TableCell>
+                  <TableCell>
+                    {user.isRestaurant && user.restaurantInfo ? (
+                      <div>
+                        <p>Name: {user.restaurantInfo.name}</p>
+                        <p>Location: {user.restaurantInfo.location}</p>
+                        <p>Contact Info: {user.restaurantInfo.contactInfo}</p>
+                        <p>Operating Hours: {user.restaurantInfo.operatingHours}</p>
+                      </div>
+                    ) : (
+                      '-'
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
+    </StyledContainer>
   );
 };
 

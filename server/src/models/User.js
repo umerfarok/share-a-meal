@@ -9,7 +9,15 @@ const userSchema = new mongoose.Schema({
     name: { type: String },
     location: { type: String },
     contactInfo: { type: String },
-    operatingHours: { type: String },
+    operatingHours: {
+      monday: { type: String },
+      tuesday: { type: String },
+      wednesday: { type: String },
+      thursday: { type: String },
+      friday: { type: String },
+      saturday: { type: String },
+      sunday: { type: String },
+    },
   },
 });
 

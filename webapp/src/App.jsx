@@ -21,12 +21,7 @@ import './styles.css';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retries: (failureCount, error) => {
-        if (error.message === 'Network Error') {
-          return failureCount <= 1 ? 1000 : false;
-        }
-        return false;
-      },
+      retry: false,
     },
   },
 });

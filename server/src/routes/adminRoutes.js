@@ -30,6 +30,5 @@ router.get('/users', adminController.getUsers);
 router.get('/listings', adminController.getListings);
 router.get('/reports', adminController.getReports);
 
-// Add routes for handling specific user, listing, and report operations
 
 module.exports = router;
