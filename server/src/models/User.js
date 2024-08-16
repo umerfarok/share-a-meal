@@ -1,13 +1,15 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-  userId: { type: String },
   email: { type: String, required: true, unique: true },
-  name: { type: String },
+  name: { type: String, required: true },
   isRestaurant: { type: Boolean, default: false },
   restaurantInfo: {
     name: { type: String },
-    location: { type: String },
+    location: {
+      type: { type: String, default: 'Point' },
+      coordinates: [Number],
+    },
     contactInfo: { type: String },
     operatingHours: {
       monday: { type: String },
@@ -18,8 +20,12 @@ const userSchema = new mongoose.Schema({
       saturday: { type: String },
       sunday: { type: String },
     },
+    cuisine: [String],
   },
+  createdAt: { type: Date, default: Date.now },
 });
+
+userSchema.index({ 'restaurantInfo.location': '2dsphere' });
 
 const User = mongoose.model('User', userSchema);
 

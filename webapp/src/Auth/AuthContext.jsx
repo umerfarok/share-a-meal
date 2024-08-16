@@ -1,25 +1,26 @@
-import { createContext, useState, useEffect, useContext } from "react";
-import * as auth from "./auth";
+import React, { createContext, useState, useEffect } from "react";
+import { Auth } from 'aws-amplify';
+import * as authFunctions from "./auth";
 
 const AuthContext = createContext();
 
 function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [token, setToken] = useState(null); 
+  const [isLoading, setIsLoading] = useState(true);
+  const [token, setToken] = useState(null);
 
   const getCurrentUser = async () => {
     try {
-      const { session: user, token } = await auth.getSession();
+      const user = await Auth.currentAuthenticatedUser();
+      const session = await Auth.currentSession();
       setUser(user);
-      setToken(token); 
+      setToken(session.getIdToken().getJwtToken());
       return user;
     } catch (err) {
-      // not logged in
       console.log(err);
       setUser(null);
       setToken(null);
-      return []
+      return null;
     }
   };
 
@@ -32,12 +33,28 @@ function AuthProvider({ children }) {
   }, []);
 
   const signIn = async (username, password) => {
-    await auth.signIn(username, password);
-    // await auth.fetchUser();
+    const result = await authFunctions.signIn(username, password);
+    await getCurrentUser();
+    return result;
   };
+
   const signOut = async () => {
-    await auth.signOut();
+    await authFunctions.signOut();
     setUser(null);
+    setToken(null);
+  };
+
+  const loginWithGoogle = async () => {
+    await authFunctions.federatedSignIn('Google');
+  };
+
+  const loginWithFacebook = async () => {
+    await authFunctions.federatedSignIn('Facebook');
+  };
+
+  const isInGroup = (groupName) => {
+    return user && user.signInUserSession.accessToken.payload['cognito:groups'] && 
+           user.signInUserSession.accessToken.payload['cognito:groups'].includes(groupName);
   };
 
   const authValue = {
@@ -46,13 +63,12 @@ function AuthProvider({ children }) {
     isLoading,
     signIn,
     signOut,
+    loginWithGoogle,
+    loginWithFacebook,
+    isInGroup,
   };
 
-  return (
-    <AuthContext.Provider value={authValue}>{children}</AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={authValue}>{children}</AuthContext.Provider>;
 }
 
 export { AuthProvider, AuthContext };
-
-

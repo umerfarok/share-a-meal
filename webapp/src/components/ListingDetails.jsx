@@ -1,54 +1,46 @@
-import { useState } from 'react';
-import axios from 'axios';
-import { useParams } from 'react-router-dom';
-import { useGetApi } from '../api';
+import React from 'react';
+import { useQuery, useMutation } from 'react-query';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Typography, Button, Card, CardContent, CircularProgress } from '@mui/material';
+import { useGetApi, usePostApi } from '../api';
 
 const ListingDetails = () => {
   const { listingId } = useParams();
-  const { data: listingdata, error, isLoading } = useGetApi(`/api/listings/${listingId}`, 'listing');
-  const [listing, setListing] = useState(null);
+  const navigate = useNavigate();
+  const { data: listing, error, isLoading } = useQuery(['listing', listingId], () => useGetApi(`/api/listings/${listingId}`, 'listing'));
+  
+  const claimMutation = useMutation((listingId) => usePostApi(`/api/listings/claim/${listingId}`, {}), {
+    onSuccess: () => {
+      navigate('/listings');
+    },
+  });
 
+  if (isLoading) return <CircularProgress />;
+  if (error) return <Typography color="error">Error: {error.message}</Typography>;
 
-  const handleClaimListing = async (listingId) => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.put(
-        `/api/listings/claim/${listingId}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.status === 200) {
-        setListing({ ...listing, claimed: true });
-      }
-    } catch (error) {
-      console.error(error);
-    }
+  const handleClaim = () => {
+    claimMutation.mutate(listingId);
   };
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
-
   return (
-    <div>
-      <h2>{listingdata.foodType}</h2>
-      <p>Quantity: {listing.quantity}</p>
-      <p>Expiration Date: {listing.expirationDate}</p>
-      <p>Dietary Information: {listing.dietaryInfo}</p>
-      <p>Restaurant: {listing.restaurant.name}</p>
-      <p>Location: {listing.restaurant.location}</p>
-      {listing.claimed ? (
-        <p>This listing has been claimed.</p>
-      ) : (
-        <button onClick={() => handleClaimListing(listing._id)}>
-          Claim Listing
-        </button>
-      )}
-    </div>
+    <Card>
+      <CardContent>
+        <Typography variant="h5" gutterBottom>{listing.foodType}</Typography>
+        <Typography>Quantity: {listing.quantity}</Typography>
+        <Typography>Expiration Date: {new Date(listing.expirationDate).toLocaleDateString()}</Typography>
+        <Typography>Dietary Information: {listing.dietaryInfo}</Typography>
+        <Typography>Restaurant: {listing.restaurant.name}</Typography>
+        <Typography>Location: {listing.restaurant.location}</Typography>
+        {!listing.claimed && (
+          <Button onClick={handleClaim} variant="contained" color="primary" disabled={claimMutation.isLoading}>
+            {claimMutation.isLoading ? 'Claiming...' : 'Claim Listing'}
+          </Button>
+        )}
+        {claimMutation.isError && (
+          <Typography color="error">Error: {claimMutation.error.message}</Typography>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import TextField from "@mui/material/TextField";
 import Button from '@material-ui/core/Button';
 import Typography from "@mui/material/Typography";
-import { signUp, confirmSignUp, resendCode } from "./auth";
+import { signUp, confirmSignUp, resendConfirmationCode as resendCode } from "./auth";
 import { Link } from "react-router-dom";
 import { usePostApi } from "../api";
 import OperatingHoursDialog from "./OperatingHoursDialog";

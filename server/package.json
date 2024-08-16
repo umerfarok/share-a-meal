@@ -2,8 +2,11 @@
   "dependencies": {
     "aws-sdk": "^2.1608.0",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
     "geolib": "^3.3.4",
+    "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "jwk-to-pem": "^2.0.5",
     "mongoose": "^8.3.2",
@@ -13,10 +16,13 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js",
+    "start": "nodemon src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
 }

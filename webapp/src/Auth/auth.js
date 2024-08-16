@@ -1,179 +1,94 @@
-import {
-    CognitoUserPool,
-    CognitoUser,
-    AuthenticationDetails,
-  } from "amazon-cognito-identity-js";
-  import { cognitoConfig } from "./cognitoConfig";
-  
-  const userPool = new CognitoUserPool({
-    UserPoolId: cognitoConfig.UserPoolId,
-    ClientId: cognitoConfig.ClientId,
-  });
+import { Auth } from 'aws-amplify';
 
-  
-export function resendCode(username) {
-  return new Promise((resolve, reject) => {
-    const userData = {
-      Username: username,
-      Pool: userPool,
-    };
-
-    const cognitoUser = new CognitoUser(userData);
-
-    cognitoUser.resendConfirmationCode((err, result) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-      resolve(result);
+export async function signUp(username, email, password) {
+  try {
+    const { user } = await Auth.signUp({
+      username,
+      password,
+      attributes: {
+        email,
+      },
     });
-  });
+    return user;
+  } catch (error) {
+    throw error;
+  }
 }
-  
-  export function signUp(username, email, password) {
-    return new Promise((resolve, reject) => {
-      userPool.signUp(
-        username,
-        password,
-        [{ Name: "email", Value: email }],
-        null,
-        (err, result) => {
-          if (err) {
-            reject(err);
-            return;
-          }
-          resolve(result.user);
-        }
-      );
-    });
+
+export async function confirmSignUp(username, code) {
+  try {
+    await Auth.confirmSignUp(username, code);
+  } catch (error) {
+    throw error;
   }
-  
-  export function confirmSignUp(username, code) {
-    return new Promise((resolve, reject) => {
-      const cognitoUser = new CognitoUser({
-        Username: username,
-        Pool: userPool,
-      });
-  
-      cognitoUser.confirmRegistration(code, true, (err, result) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-        resolve(result);
-      });
-    });
+}
+
+export async function resendConfirmationCode(username) {
+  try {
+    await Auth.resendSignUp(username);
+  } catch (error) {
+    throw error;
   }
-  
-  export function signIn(username, password) {
-    return new Promise((resolve, reject) => {
-      const authenticationDetails = new AuthenticationDetails({
-        Username: username,
-        Password: password,
-      });
-  
-      const cognitoUser = new CognitoUser({
-        Username: username,
-        Pool: userPool,
-      });
-  
-      cognitoUser.authenticateUser(authenticationDetails, {
-        onSuccess: (result) => {
-          resolve(result);
-        },
-        onFailure: (err) => {
-          reject(err);
-        },
-      });
-    });
+}
+
+export async function signIn(username, password) {
+  try {
+    const user = await Auth.signIn(username, password);
+    return user;
+  } catch (error) {
+    throw error;
   }
-  
-  export function forgotPassword(username) {
-    return new Promise((resolve, reject) => {
-      const cognitoUser = new CognitoUser({
-        Username: username,
-        Pool: userPool,
-      })
-  
-      cognitoUser.forgotPassword({
-        onSuccess: () => {
-          resolve()
-        },
-        onFailure: (err) => {
-          reject(err)
-        },
-      })
-    })
+}
+
+export async function forgotPassword(username) {
+  try {
+    await Auth.forgotPassword(username);
+  } catch (error) {
+    throw error;
   }
-  
-  export function confirmPassword(username, confirmationCode, newPassword) {
-    return new Promise((resolve, reject) => {
-      const cognitoUser = new CognitoUser({
-        Username: username,
-        Pool: userPool,
-      })
-  
-      cognitoUser.confirmPassword(confirmationCode, newPassword, {
-        onSuccess: () => {
-          resolve()
-        },
-        onFailure: (err) => {
-          reject(err)
-        },
-      })
-    })
+}
+
+export async function confirmPassword(username, code, newPassword) {
+  try {
+    await Auth.forgotPasswordSubmit(username, code, newPassword);
+  } catch (error) {
+    throw error;
   }
-  
-  export function signOut() {
-    const cognitoUser = userPool.getCurrentUser();
-    if (cognitoUser) {
-      cognitoUser.signOut();
-    }
+}
+
+export async function signOut() {
+  try {
+    await Auth.signOut();
+  } catch (error) {
+    throw error;
   }
-  
-  export async function getCurrentUser() {
-    return new Promise((resolve, reject) => {
-      const cognitoUser = userPool.getCurrentUser();
-  
-      if (!cognitoUser) {
-        reject(new Error("No user found"));
-        return;
-      }
-  
-      cognitoUser.getSession((err, session) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-        cognitoUser.getUserAttributes((err, attributes) => {
-          if (err) {
-            reject(err);
-            return;
-          }
-          const userData = attributes.reduce((acc, attribute) => {
-            acc[attribute.Name] = attribute.Value;
-            return acc;
-          }, {});
-  
-          resolve({ ...userData, username: cognitoUser.username });
-        });
-      });
-    });
+}
+
+export async function getCurrentUser() {
+  try {
+    const user = await Auth.currentAuthenticatedUser();
+    return user;
+  } catch (error) {
+    throw error;
   }
-  export function getSession() {
-    const cognitoUser = userPool.getCurrentUser();
-    return new Promise((resolve, reject) => {
-      if (!cognitoUser) {
-        reject(new Error("No user found"));
-        return;
-      }
-      cognitoUser.getSession((err, session) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-        const token = session.getIdToken().getJwtToken();
-        resolve({ session, token });
-      });
-    });
+}
+
+export async function getSession() {
+  try {
+    const session = await Auth.currentSession();
+    return {
+      session,
+      token: session.getIdToken().getJwtToken(),
+    };
+  } catch (error) {
+    throw error;
   }
+}
+
+export async function federatedSignIn(provider) {
+  try {
+    await Auth.federatedSignIn({ provider });
+  } catch (error) {
+    throw error;
+  }
+}

@@ -1,60 +1,85 @@
-import { useState, useContext } from "react"
-import { AuthContext } from "./AuthContext"
-import { Navigate } from "react-router-dom";
-import { Link } from "react-router-dom"
-import TextField from '@mui/material/TextField';
+import React, { useState, useContext } from "react";
+import { AuthContext } from "./AuthContext";
+import { Navigate, Link } from "react-router-dom";
+import { TextField, Button, Typography, Box } from '@mui/material';
+import { Google as GoogleIcon, Facebook as FacebookIcon } from '@mui/icons-material';
 
 export default function Login() {
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  const { user, signIn } = useContext(AuthContext)
+  const { user, signIn, loginWithGoogle, loginWithFacebook } = useContext(AuthContext);
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError("")
+    e.preventDefault();
+    setError("");
 
     try {
-      await signIn(username, password)
-
+      await signIn(username, password);
     } catch (err) {
-      setError(err.message)
+      setError(err.message);
     }
-  }
+  };
 
-  console.log({user})
   if (user) {
-    return <Navigate to="/profile" />
+    return <Navigate to="/profile" />;
   }
 
   return (
-    <div className="flex  h-[600px] w-full items-center justify-center px-4">
-    <div className="w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-md ">
-      <div className="space-y-4 text-center">
-        <h2 className="text-3xl font-bold mb-5 text-purple-700">Login</h2>
-      </div>
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <div className="space-y-2">
-
-        </div>
-        <TextField    className="w-full rounded-md " id="outlined-basic" label="Username" variant="outlined" color="secondary"   onChange={(e) => setUsername(e.target.value)}  value={username}/>
-        <div className="space-y-2">
-        <TextField    className="w-full rounded-md " id="outlined-basic" label="Password" variant="outlined" color="secondary"     value={password}
-            onChange={(e) => setPassword(e.target.value)}/>
-    
-        </div>
-        <button
-          className="w-full rounded-md bg-purple-800 py-2 font-medium text-white transition-colors hover:bg-purple-700/80 focus:outline-none focus:ring-2 focus:ring-purple-800 focus:ring-offset-2 "
+    <Box sx={{ maxWidth: 400, margin: 'auto' }}>
+      <Typography variant="h4" gutterBottom sx={{ textAlign: 'center' }}>Login</Typography>
+      <form onSubmit={handleSubmit}>
+        <TextField
+          fullWidth
+          margin="normal"
+          label="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <TextField
+          fullWidth
+          margin="normal"
+          label="Password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        {error && <Typography color="error" sx={{ mt: 2 }}>{error}</Typography>}
+        <Button
+          fullWidth
+          variant="contained"
+          color="primary"
           type="submit"
+          sx={{ mt: 2 }}
         >
           Login
-        </button>
-        <div className="text-center text-sm text-gray-500 underline hover:text-gray-900 ">
-        <Link to="/forgot-password">Forgot Password</Link>
-        </div>
+        </Button>
       </form>
-    </div>
-  </div>
-  )
+      <Box sx={{ mt: 2, textAlign: 'center' }}>
+        <Link to="/forgot-password" style={{ textDecoration: 'none' }}>
+          <Typography color="primary">Forgot Password?</Typography>
+        </Link>
+      </Box>
+      <Box sx={{ mt: 2 }}>
+        <Button
+          fullWidth
+          variant="outlined"
+          startIcon={<GoogleIcon />}
+          onClick={loginWithGoogle}
+          sx={{ mb: 1 }}
+        >
+          Login with Google
+        </Button>
+        <Button
+          fullWidth
+          variant="outlined"
+          startIcon={<FacebookIcon />}
+          onClick={loginWithFacebook}
+        >
+          Login with Facebook
+        </Button>
+      </Box>
+    </Box>
+  );
 }

@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import Button from '@mui/joy/Button';
 import { styled } from '@mui/joy/styles';
 import DensityMediumIcon from '@mui/icons-material/DensityMedium';
+import { AuthContext } from '../../Auth/AuthContext';
+import { Auth } from 'aws-amplify';
 
 const CustomButton = styled(Button)({
   fontSize: '16px',
@@ -19,6 +21,9 @@ const Navbar = () => {
   const dropdownTimeoutRef = useRef(null);
   const mobileDropdownRef = useRef(null);
   const mobileDropdownTimeoutRef = useRef(null);
+
+  const { user, isInGroup } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -81,6 +86,15 @@ const Navbar = () => {
     };
   }, []);
 
+  const signOut = async () => {
+    try {
+      await Auth.signOut();
+      navigate('/login');
+    } catch (error) {
+      console.log('error signing out: ', error);
+    }
+  };
+
   return (
     <header className="bg-white text-gray-800 py-2 px-6 md:px-8 lg:px-10 shadow-lg">
       <div className="flex justify-between items-center">
@@ -94,26 +108,39 @@ const Navbar = () => {
             </CustomButton>
           </Link>
 
-          <Link to="/login">
-            <CustomButton size="md" variant="plain">
-              Login
-            </CustomButton>
-          </Link>
-          <Link to="/signup">
-            <CustomButton size="md" variant="plain">
-              Sign Up
-            </CustomButton>
-          </Link>
-          <Link to="/profile">
-            <CustomButton size="md" variant="plain">
-              Profile
-            </CustomButton>
-          </Link>
-          <Link to="/admin">
-            <CustomButton size="md" variant="plain">
-              Admin
-            </CustomButton>
-          </Link>
+          {user ? (
+            <>
+              <Link to="/profile">
+                <CustomButton size="md" variant="plain">
+                  Profile
+                </CustomButton>
+              </Link>
+              {isInGroup('superadmin') && (
+                <Link to="/admin">
+                  <CustomButton size="md" variant="plain">
+                    Admin
+                  </CustomButton>
+                </Link>
+              )}
+              <CustomButton size="md" variant="plain" onClick={signOut}>
+                Logout
+              </CustomButton>
+            </>
+          ) : (
+            <>
+              <Link to="/login">
+                <CustomButton size="md" variant="plain">
+                  Login
+                </CustomButton>
+              </Link>
+              <Link to="/signup">
+                <CustomButton size="md" variant="plain">
+                  Sign Up
+                </CustomButton>
+              </Link>
+            </>
+          )}
+
           <div className="relative" ref={dropdownRef}>
             <CustomButton
               size="md"
@@ -173,46 +200,64 @@ const Navbar = () => {
                   >
                     About
                   </Link>
-                  <Link
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    to="/login"
-                    id="menu-item-1"
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    to="/signup"
-                    id="menu-item-2"
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Sign Up
-                  </Link>
-                  <Link
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    to="/profile"
-                    id="menu-item-3"
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Profile
-                  </Link>
-                  <Link
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    to="/admin"
-                    id="menu-item-4"
-                    role="menuitem"
-                    tabIndex="-1"
-                  >
-                    Admin
-                  </Link>
+                  {user ? (
+                    <>
+                      <Link
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        to="/profile"
+                        id="menu-item-1"
+                        role="menuitem"
+                        tabIndex="-1"
+                      >
+                        Profile
+                      </Link>
+                      {isInGroup('superadmin') && (
+                        <Link
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          to="/admin"
+                          id="menu-item-2"
+                          role="menuitem"
+                          tabIndex="-1"
+                        >
+                          Admin
+                        </Link>
+                      )}
+                      <button
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={signOut}
+                        id="menu-item-3"
+                        role="menuitem"
+                        tabIndex="-1"
+                      >
+                        Logout
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        to="/login"
+                        id="menu-item-4"
+                        role="menuitem"
+                        tabIndex="-1"
+                      >
+                        Login
+                      </Link>
+                      <Link
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        to="/signup"
+                        id="menu-item-5"
+                        role="menuitem"
+                        tabIndex="-1"
+                      >
+                        Sign Up
+                      </Link>
+                    </>
+                  )}
                   <Link
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     to="/listings"
-                    id="menu-item-5"
+                    id="menu-item-6"
                     role="menuitem"
                     tabIndex="-1"
                   >
@@ -221,7 +266,7 @@ const Navbar = () => {
                   <Link
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     to="/restaurant-profile"
-                    id="menu-item-6"
+                    id="menu-item-7"
                     role="menuitem"
                     tabIndex="-1"
                   >
@@ -230,7 +275,7 @@ const Navbar = () => {
                   <Link
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     to="/update-restaurant-profile"
-                    id="menu-item-7"
+                    id="menu-item-8"
                     role="menuitem"
                     tabIndex="-1"
                   >
@@ -241,7 +286,7 @@ const Navbar = () => {
             </div>
           </div>
         </div>
-        </div>
+      </div>
     </header>
   );
 };
